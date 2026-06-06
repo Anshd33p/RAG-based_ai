@@ -1,5 +1,3 @@
-#ollama msut be installed
-#ollama pull bge-m3 must be run to pull the model
 import joblib
 import requests
 import os
@@ -30,10 +28,7 @@ for json_file in jsons:
         chunk['embedding'] = embeddings[i]
         my_dict.append(chunk)
 
-    with open(os.path.join("json_embeddings", json_file), "w") as f:
-        json.dump(content, f)
-
 df = pd.DataFrame.from_records(my_dict)
-print(df)
+# print(df)
 
 joblib.dump(df, "embeddings.joblib")
