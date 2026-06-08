@@ -6,6 +6,8 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
+file_name = "merged_jsons" if os.path.exists("merged_jsons") else "jsons"
+
 def create_embeddings(text_list):
     response = requests.post("http://localhost:11434/api/embed", json={
         "model": "bge-m3",
@@ -15,11 +17,11 @@ def create_embeddings(text_list):
     return embeddings
 
 
-jsons = os.listdir("jsons")
+jsons = os.listdir(file_name)
 my_dict = []
     
 for json_file in jsons:
-    with open(os.path.join("jsons", json_file), "r") as f:
+    with open(os.path.join(file_name, json_file), "r") as f:
         content = json.load(f)
     text_list = [c["text"] for c in content["chunks"]] 
     embeddings = create_embeddings(text_list)
