@@ -9,6 +9,8 @@ This repository contains simple scripts to convert video files to audio, transcr
 - `create_embeddings.py` - sends chunk texts to a local embedding API and stores `embeddings.joblib`.
 - `process_embeddings.py` - loads `embeddings.joblib`, encodes a user query, finds similar chunks, then queries a local generation API to produce a human-readable answer.
 - `embeddings.joblib` - example output produced by `create_embeddings.py`.
+- `merge_chunks.py` - groups smaller transcription chunks from `jsons/` into larger chunks and writes them to `merged_jsons/`.
+- `merged_embeddings.joblib` - an example/alternative embeddings file produced when using merged chunks; `create_embeddings.py` reads from `merged_jsons/` and writes `embeddings.joblib` by default.
 
 Directory structure (important files/folders):
 
@@ -16,8 +18,10 @@ Directory structure (important files/folders):
 audios/       # audio files (mp3)
 videos/       # video source files (mp4/...)
 jsons/        # transcription outputs from mp3_to_json.py
-json_embeddings/ # probably cached or exported json embeddings
+json_embeddings/ # cached or exported per-file json embeddings
+merged_jsons/  # merged chunk outputs created by `merge_chunks.py`
 embeddings.joblib
+merged_embeddings.joblib
 *.py          # utility scripts
 ```
 
@@ -81,6 +85,14 @@ python create_embeddings.py
 
 This script sends the chunk text list to `http://localhost:11434/api/embed` (model `bge-m3` by default) and saves a `embeddings.joblib` file.
 
+3a. (Optional) Merge small transcription chunks into larger groups before embedding:
+
+```powershell
+python merge_chunks.py
+```
+
+This reads files from `jsons/`, groups chunks (default group size is 5), and writes combined files to `merged_jsons/`. Run this before `create_embeddings.py` if you want embeddings computed over merged chunks instead of the original smaller chunks.
+
 4. Run a RAG-style query using the precomputed embeddings:
 
 ```powershell
@@ -100,4 +112,5 @@ Enter your question when prompted. The script computes the query embedding, find
 - If `ffmpeg` commands fail, verify `ffmpeg` is installed and accessible from the terminal.
 - If `whisper` import fails, ensure you installed the correct Whisper package (the repo expects a `whisper` module).
 - If the embedding/generation requests return errors, double-check the server is running at `http://localhost:11434` and the endpoint names and payloads match the server API.
+ - If you add or update scripts, run `python merge_chunks.py` (if needed) and then `python create_embeddings.py` to regenerate embeddings.
 
