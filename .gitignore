@@ -4,3 +4,4 @@ jsons/
 json_embeddings/
 .vscode/
 *.joblib
+merged_jsons/
